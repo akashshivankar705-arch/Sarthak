@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knock Knock!</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #0d1117;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .fullscreen-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .media-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      max-height: 70vh;
+      border-radius: 16px;
+      overflow: hidden;
+      background-color: #000000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      border: 1px solid #30363d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Wrong passcode GIF element */
+    .error-gif {
+      display: none;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Fullscreen Start Overlay */
+    .start-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(13, 17, 23, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: opacity 0.3s ease;
+    }
+
+    .start-overlay span {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffffff;
+      background: #238636;
+      padding: 16px 32px;
+      border-radius: 40px;
+      box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4);
+    }
+
+    .input-section {
+      margin-top: 24px;
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(15px);
+      transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+    }
+
+    .input-section.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 14px 18px;
+      font-size: 18px;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      background-color: #161b22;
+      color: #ffffff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #58a6ff;
+    }
+
+    input[type="text"]::placeholder {
+      color: #8b949e;
+    }
+
+    button {
+      padding: 14px 24px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #238636;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #2ea043;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fullscreen-container">
+    <div class="media-wrapper">
+      <!-- Click to Start Overlay for Audio -->
+      <div id="startOverlay" class="start-overlay" onclick="startVideo()">
+        <span>🔊 Tap to Play</span>
+      </div>
+
+      <!-- Main Video -->
+      <video id="knockVideo" playsinline>
+        <source src="1000151112.mp4" type="video/mp4">
+        Your browser does not support video playback.
+      </video>
+
+      <!-- Incorrect Passcode GIF -->
+      <img id="errorGif" class="error-gif" src="1000151398.gif" alt="I AM SORRY, BABU">
+    </div>
+
+    <!-- Input bar revealed when video finishes -->
+    <div id="interactiveBar" class="input-section">
+      <div class="input-group">
+        <input type="text" id="nameInput" placeholder="your name" autocomplete="off">
+        <button onclick="submitAnswer()">Enter</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('knockVideo');
+    const errorGif = document.getElementById('errorGif');
+    const startOverlay = document.getElementById('startOverlay');
+    const interactiveBar = document.getElementById('interactiveBar');
+    const nameInput = document.getElementById('nameInput');
+
+    function startVideo() {
+      startOverlay.style.opacity = '0';
+      setTimeout(() => {
+        startOverlay.style.display = 'none';
+      }, 300);
+
+      video.muted = false;
+      video.play();
+    }
+
+    // Reveal input bar when video finishes
+    video.addEventListener('ended', () => {
+      interactiveBar.classList.add('visible');
+      nameInput.focus();
+    });
+
+    // Handle Enter key press
+    nameInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        submitAnswer();
+      }
+    });
+
+    function submitAnswer() {
+      const enteredName = nameInput.value.trim();
+
+      // Check for exact passcode "Sarthak" (case-insensitive)
+      if (enteredName.toLowerCase() === "sarthak") {
+        localStorage.setItem('friendName', enteredName);
+        window.location.href = "page2.html";
+      } else {
+        // Hide video, display the GIF
+        video.style.display = 'none';
+        errorGif.style.display = 'block';
+        nameInput.value = '';
+        nameInput.placeholder = 'Try again...';
+      }
+    }
+  </script>
+
+</body>
+</html>
